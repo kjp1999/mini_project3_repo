@@ -3,9 +3,9 @@ try:
   from csci3202.im2col_cython import col2im_cython, im2col_cython
   from csci3202.im2col_cython import col2im_6d_cython
 except ImportError:
-  print 'run the following from the csci3202 directory and try again:'
-  print 'python setup.py build_ext --inplace'
-  print 'You may also need to restart your iPython kernel'
+  print('run the following from the csci3202 directory and try again:')
+  print('python setup.py build_ext --inplace')
+  print('You may also need to restart your iPython kernel')
 
 from csci3202.im2col import *
 
