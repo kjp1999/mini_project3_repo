@@ -111,8 +111,10 @@ def relu_backward(dout, cache):
   # TODO: Implement the ReLU backward pass.                                   #
   #############################################################################
   x = cache
-  out = np.maximum(0, x) # ReLU performed again
+
+  out = np.maximum(0, x) 
   out[out > 0 ] = 1
+
   dx = out * dout
   #############################################################################
   #                             END OF YOUR CODE                              #
@@ -268,20 +270,21 @@ def conv_forward_naive(x, w, b, conv_param):
   # TODO: Implement the convolutional forward pass.                           #
   # Hint: you can use the function np.pad for padding.                        #
   #############################################################################
-  N, C, H, W = x.shape
-  F, _, HH, WW = w.shape
+  (N, C, H, W) = x.shape
+  (F, c, HH, WW) = w.shape
+
   stride, pad = conv_param['stride'], conv_param['pad']
-  H_out = 1 + (H + 2 * pad - HH) / stride
-  W_out = 1 + (W + 2 * pad - WW) / stride
+  hout = 1 + (H + 2 * pad - HH) / stride
+  wout = 1 + (W + 2 * pad - WW) / stride
 
-  out = np.zeros((int(N) , int(F) , int(H_out), int(W_out)))
+  out = np.zeros((int(N) , int(F) , int(hout), int(wout)))
 
-  x_pad = np.pad(x, ((0,), (0,), (pad,), (pad,)), mode='constant', constant_values=0)
-  for i in range(int(H_out)):
-      for j in range(int(W_out)):
-          x_pad_masked = x_pad[:, :, i*stride:i*stride+HH, j*stride:j*stride+WW]
+  xpad = np.pad(x, ((0,), (0,), (pad,), (pad,)), mode='constant', constant_values=0)
+  for i in range(int(hout)):
+      for j in range(int(wout)):
+          xpad_masked = xpad[:, :, i*stride:i*stride+HH, j*stride:j*stride+WW]
           for k in range(int(F)):
-              out[:, k , i, j] = np.sum(x_pad_masked * w[k, :, :, :], axis=(1,2,3))
+              out[:, k , i, j] = np.sum(xpad_masked * w[k, :, :, :], axis=(1,2,3))
           
   out = out + (b)[None, :, None, None]
 
@@ -314,27 +317,27 @@ def conv_backward_naive(dout, cache):
   N, C, H, W = x.shape
   F, _, HH, WW = w.shape
   stride, pad = conv_param['stride'], conv_param['pad']
-  H_out = 1 + (H + 2 * pad - HH) / stride
-  W_out = 1 + (W + 2 * pad - WW) / stride
+  hout = 1 + (H + 2 * pad - HH) / stride
+  wout = 1 + (W + 2 * pad - WW) / stride
   
-  x_pad = np.pad(x, ((0,), (0,), (pad,), (pad,)), mode='constant', constant_values=0)
+  xpad = np.pad(x, ((0,), (0,), (pad,), (pad,)), mode='constant', constant_values=0)
   dx = np.zeros_like(x)
-  dx_pad = np.zeros_like(x_pad)
+  dxpad = np.zeros_like(xpad)
   dw = np.zeros_like(w)
   db = np.zeros_like(b)
   
   db = np.sum(dout, axis = (0,2,3))
   
-  x_pad = np.pad(x, ((0,), (0,), (pad,), (pad,)), mode='constant', constant_values=0)
-  for i in range(int(H_out)):
-      for j in range(int(W_out)):
-          x_pad_masked = x_pad[:, :, i*stride:i*stride+HH, j*stride:j*stride+WW]
+  xpad = np.pad(x, ((0,), (0,), (pad,), (pad,)), mode='constant', constant_values=0)
+  for i in range(int(hout)):
+      for j in range(int(wout)):
+          xpad_masked = xpad[:, :, i*stride:i*stride+HH, j*stride:j*stride+WW]
           for k in range(int(F)): #compute dw
-              dw[k ,: ,: ,:] += np.sum(x_pad_masked * (dout[:, k, i, j])[:, None, None, None], axis=0)
-          for n in range(int(N)): #compute dx_pad
-              dx_pad[n, :, i*stride:i*stride+HH, j*stride:j*stride+WW] += np.sum((w[:, :, :, :] * 
+              dw[k ,: ,: ,:] += np.sum(xpad_masked * (dout[:, k, i, j])[:, None, None, None], axis=0)
+          for n in range(int(N)): #compute dxpad
+              dxpad[n, :, i*stride:i*stride+HH, j*stride:j*stride+WW] += np.sum((w[:, :, :, :] * 
                                                  (dout[n, :, i, j])[:,None ,None, None]), axis=0)
-  dx = dx_pad[:,:,pad:-pad,pad:-pad]
+  dx = dxpad[:,:,pad:-pad,pad:-pad]
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
