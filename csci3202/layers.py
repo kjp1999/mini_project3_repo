@@ -24,9 +24,11 @@ def affine_forward(x, w, b):
   # TODO: Implement the affine forward pass. Store the result in out. You     #
   # will need to reshape the input into rows.                                 #
   #############################################################################
-  row_dim = x.shape[0]
-  col_dim = np.prod(x.shape[1:])
-  x_reshape = x.reshape(row_dim, col_dim)
+  rowd = x.shape[0]
+  cold= np.prod(x.shape[1:])
+
+  x_reshape = x.reshape(rowd, cold)
+
   out = np.dot(x_reshape, w) + b
   #############################################################################
   #                             END OF YOUR CODE                              #
@@ -59,9 +61,9 @@ def affine_backward(dout, cache):
   w = cache[1]
   b = cache[2]
 
-  row_dim = x.shape[0]
-  col_dim = np.prod(x.shape[1:])
-  x_reshape = x.reshape(row_dim, col_dim)
+  rowd = x.shape[0]
+  cold = np.prod(x.shape[1:])
+  x_reshape = x.reshape(rowd, cold)
 
   dw = x_reshape.T.dot(dout)
   dx = dout.dot(w.T).reshape(x.shape)
@@ -241,6 +243,8 @@ def batchnorm_backward(dout, cache):
       dx = dxn / std
   else:
       raise ValueError(mode)
+      
+  return dx, dgamma, dbeta
 
 def conv_forward_naive(x, w, b, conv_param):
   """
@@ -285,7 +289,7 @@ def conv_forward_naive(x, w, b, conv_param):
   for i in range(int(hout)):
       for j in range(int(wout)):
 
-          xpad_masked = xpad[:, :, i*stride:i*stride+HH, j*stride:j*stride+WW]
+          xpad_masked = xpad[:, :, i * stride:i * stride + HH, j * stride:j * stride + WW]
 
           for k in range(int(F)):
               out[:, k , i, j] = np.sum(xpad_masked * w[k, :, :, :], axis=(1,2,3))
@@ -340,7 +344,7 @@ def conv_backward_naive(dout, cache):
   for i in range(int(hout)):
       for j in range(int(wout)):
 
-          xpad_masked = xpad[:, :, i*stride:i*stride+HH, j*stride:j*stride+WW]
+          xpad_masked = xpad[:, :, i * stride:i * stride + HH, j * stride:j * stride + WW]
 
           for k in range(int(F)): #compute dw
               dw[k ,: ,: ,:] += np.sum(xpad_masked * (dout[:, k, i, j])[:, None, None, None], axis=0)

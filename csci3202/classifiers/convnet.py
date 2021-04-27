@@ -130,5 +130,3 @@ class ThreeLayerConvNet(object):
     
     return loss, grads
   
-  
-pass
