@@ -27,9 +27,9 @@ def affine_forward(x, w, b):
   rowd = x.shape[0]
   cold= np.prod(x.shape[1:])
 
-  x_reshape = x.reshape(rowd, cold)
+  xreshape = x.reshape(rowd, cold)
 
-  out = np.dot(x_reshape, w) + b
+  out = np.dot(xreshape, w) + b
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -63,9 +63,9 @@ def affine_backward(dout, cache):
 
   rowd = x.shape[0]
   cold = np.prod(x.shape[1:])
-  x_reshape = x.reshape(rowd, cold)
+  xreshape = x.reshape(rowd, cold)
 
-  dw = x_reshape.T.dot(dout)
+  dw = xreshape.T.dot(dout)
   dx = dout.dot(w.T).reshape(x.shape)
   db = np.sum(dout, axis=0)  
   #############################################################################
@@ -243,7 +243,7 @@ def batchnorm_backward(dout, cache):
       dx = dxn / std
   else:
       raise ValueError(mode)
-      
+
   return dx, dgamma, dbeta
 
 def conv_forward_naive(x, w, b, conv_param):
@@ -324,12 +324,13 @@ def conv_backward_naive(dout, cache):
   
   (N, C, H, W)= x.shape
   (F, c, HH, WW )= w.shape
-
+  #define stride and padding params
   stride, pad = conv_param['stride'], conv_param['pad']
-
+  #calculate values
   hout = 1 + (H + 2 * pad - HH) / stride
   wout = 1 + (W + 2 * pad - WW) / stride
   
+  #x arr padding
   xpad = np.pad(x, ((0,), (0,), (pad,), (pad,)), mode='constant', constant_values=0)
 
   dx = np.zeros_like(x)
@@ -341,6 +342,7 @@ def conv_backward_naive(dout, cache):
   
   xpad = np.pad(x, ((0,), (0,), (pad,), (pad,)), mode='constant', constant_values=0)
 
+  #who doesn't love n^3 time 
   for i in range(int(hout)):
       for j in range(int(wout)):
 
@@ -422,10 +424,13 @@ def max_pool_backward_naive(dout, cache):
   out_height = H / pool_param['pool_height']
 
   out_width = W / pool_param['pool_width']
+
+
   for i in range(int(out_height)):
       for j in range(int(out_width)):
+        #long functions are fun right??? or maybe im just loosing it
           x_mask = x[:, :, i*pool_param['stride']:i*pool_param['stride']+pool_param['pool_height'], j*pool_param['stride']:j*pool_param['stride']+pool_param['pool_width']]
-
+          #i hope someone reads and appricieates my semicomedic comments that are less than useless for code readability
           dx_mask = dx[:, :, i*pool_param['stride']:i*pool_param['stride']+pool_param['pool_height'], j*pool_param['stride']:j*pool_param['stride']+pool_param['pool_width']]
 
           flags = np.max(x_mask, axis=(2, 3), keepdims=True) == x_mask
